@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa Serwisowa — Module Production T1.Standard P</title>
+<style>
+:root{
+  --cc:#0ea472;--cs:#1d6fc4;--c3:#7c3aed;--cw:#ea6f0e;
+  --cz:#e11d48;--cl:#0891b2;--ce:#0d7a5f;--ca:#a16207;--cx:#6366f1;
+  --bg:#f0f7ff;--surface:#fff;--surface2:#e8f2fd;--border:#c5ddf7;
+  --text:#0d2d52;--muted:#4a7ab5;--dim:#8fb3d8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(--text);}
+.topbar{background:linear-gradient(135deg,#1d6fc4,#2e8de8);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(29,111,196,.2);}
+.topbar h1{color:#fff;font-size:16px;font-weight:600;}
+.tbr{display:flex;align-items:center;gap:8px;}
+.edtbtn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:#fff;font-size:12px;padding:5px 14px;border-radius:100px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.edtbtn:hover{background:rgba(255,255,255,0.3);}
+.edtbtn.on{background:#fff;color:#1d6fc4;font-weight:600;}
+.save-ind{font-size:11px;color:rgba(255,255,255,0.85);display:none;}
+.save-ind.show{display:block;}
+.hero{padding:30px 28px 22px;background:linear-gradient(160deg,#deeeff,var(--bg));border-bottom:1px solid var(--border);}
+.hero h2{font-size:26px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.hero h2 em{font-style:normal;color:#1d6fc4;}
+.hero p{font-size:13px;color:var(--muted);line-height:1.6;max-width:440px;}
+.stats{display:flex;gap:24px;margin-top:16px;}
+.sv{font-size:20px;font-weight:600;color:#1d6fc4;}
+.sl{font-size:11px;color:var(--muted);}
+.edit-notice{display:none;padding:9px 28px;background:rgba(29,111,196,.08);border-bottom:1px solid rgba(29,111,196,.2);font-size:12px;color:#1d6fc4;}
+.edit-notice.show{display:block;}
+.person-notice{display:none;padding:8px 28px;background:#fff8e6;border-bottom:1px solid #fcd97a;font-size:12px;color:#92620a;align-items:center;gap:8px;}
+.person-notice.show{display:flex;}
+.pnclear{margin-left:auto;background:none;border:1px solid #fcd97a;color:#92620a;font-size:11px;padding:2px 10px;border-radius:100px;cursor:pointer;font-family:inherit;}
+.pnclear:hover{background:#fcd97a;}
+.filters{padding:12px 28px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--border);background:var(--surface);}
+.fl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-right:4px;}
+.fb{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:12px;padding:4px 12px;border-radius:100px;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:all .2s;}
+.fb:hover{border-color:#7ab8f0;}
+.fd{width:7px;height:7px;border-radius:50%;}
+.fb[data-f="all"].act{background:#1d6fc4;border-color:#1d6fc4;color:#fff;font-weight:600;}
+.fb[data-f="cc"].act{background:rgba(14,164,114,.1);border-color:var(--cc);color:var(--cc);font-weight:600;}
+.fb[data-f="cs"].act{background:rgba(29,111,196,.1);border-color:var(--cs);color:var(--cs);font-weight:600;}
+.fb[data-f="c3"].act{background:rgba(124,58,237,.1);border-color:var(--c3);color:var(--c3);font-weight:600;}
+.fb[data-f="cw"].act{background:rgba(234,111,14,.1);border-color:var(--cw);color:var(--cw);font-weight:600;}
+.fb[data-f="cz"].act{background:rgba(225,29,72,.1);border-color:var(--cz);color:var(--cz);font-weight:600;}
+.fb[data-f="cl"].act{background:rgba(8,145,178,.1);border-color:var(--cl);color:var(--cl);font-weight:600;}
+.fb[data-f="ce"].act{background:rgba(13,122,95,.1);border-color:var(--ce);color:var(--ce);font-weight:600;}
+.fb[data-f="ca"].act{background:rgba(161,98,7,.1);border-color:var(--ca);color:var(--ca);font-weight:600;}
+.fb[data-f="cx"].act{background:rgba(99,102,241,.1);border-color:var(--cx);color:var(--cx);font-weight:600;}
+.gw{padding:24px 28px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px;}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,transform .15s,box-shadow .2s;cursor:pointer;}
+.tile:hover{border-color:#7ab8f0;box-shadow:0 4px 18px rgba(29,111,196,.12);transform:translateY(-2px);}
+.tile.open{border-color:#1d6fc4;box-shadow:0 6px 24px rgba(29,111,196,.16);grid-column:span 2;}
+.stripe{height:3px;}
+.thdr{padding:15px 17px 11px;display:flex;align-items:flex-start;gap:11px;}
+.tico{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-size:17px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);}
+.tmeta{flex:1;min-width:0;}
+.tcat{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:2px;}
+.ttit{font-size:14px;font-weight:600;color:var(--text);line-height:1.3;}
+.tdesc{font-size:11px;color:var(--muted);line-height:1.6;margin-top:2px;}
+.tbadges{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.bdoc{display:inline-flex;align-items:center;gap:3px;background:rgba(29,111,196,.1);border:1px solid rgba(29,111,196,.2);color:#1d6fc4;font-size:9px;font-weight:600;padding:2px 7px;border-radius:100px;}
+.bdate{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);color:var(--dim);font-size:9px;padding:2px 7px;border-radius:100px;}
+.togbtn{width:21px;height:21px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:grid;place-items:center;flex-shrink:0;transition:all .25s;color:var(--muted);font-size:14px;line-height:1;}
+.tile.open .togbtn{background:#1d6fc4;border-color:#1d6fc4;color:#fff;transform:rotate(45deg);}
+.tbody{display:none;padding:0 17px 15px;border-top:1px solid var(--border);}
+.tile.open .tbody{display:block;}
+.slbl{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin:12px 0 6px;}
+.llist{display:flex;flex-direction:column;gap:4px;}
+.spl{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-decoration:none;color:var(--text);font-size:12px;transition:all .2s;}
+.spl:hover{border-color:#7ab8f0;background:#deeeff;}
+.sico{width:22px;height:22px;background:rgba(29,111,196,.1);border-radius:5px;display:grid;place-items:center;font-size:11px;flex-shrink:0;}
+.snm{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+.ssub{font-size:10px;color:var(--muted);}
+.sarr{color:var(--dim);font-size:11px;transition:transform .15s;}
+.spl:hover .sarr{transform:translateX(3px);color:#1d6fc4;}
+.xbtn{background:none;border:none;color:var(--dim);cursor:pointer;font-size:13px;padding:0 3px;display:none;line-height:1;}
+.xbtn:hover{color:#e11d48;}
+.edit-mode .xbtn{display:block;}
+.contacts{display:flex;flex-wrap:wrap;gap:5px;}
+.chip{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px 9px 3px 4px;font-size:12px;color:var(--text);cursor:pointer;transition:all .2s;}
+.chip:hover{background:#deeeff;border-color:#7ab8f0;}
+.chip.pactive{background:#1d6fc4;border-color:#1d6fc4;color:#fff;}
+.chip.pactive .av{background:rgba(255,255,255,.3);}
+.av{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,#1d6fc4,#2e8de8);display:grid;place-items:center;font-size:7px;font-weight:700;color:#fff;flex-shrink:0;}
+.empty-hint{font-size:11px;color:var(--dim);padding:3px 0;}
+.addform{margin-top:8px;background:var(--surface2);border:1px dashed var(--border);border-radius:8px;padding:10px;display:none;}
+.edit-mode .addform{display:block;}
+.addform input{width:100%;margin-bottom:6px;font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);}
+.addform input:focus{outline:none;border-color:#1d6fc4;}
+.arow{display:flex;gap:5px;}
+.arow input{flex:1;}
+.abtn{background:#1d6fc4;border:none;color:#fff;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.abtn:hover{background:#1557a8;}
+.apform{display:none;gap:5px;margin-top:7px;}
+.edit-mode .apform{display:flex;}
+.apform input{flex:1;font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);}
+.apform input:focus{outline:none;border-color:#1d6fc4;}
+.loading-msg{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
+.footer{text-align:center;padding:24px;color:var(--dim);font-size:11px;border-top:1px solid var(--border);background:var(--surface);margin-top:16px;}
+.toast{position:fixed;bottom:20px;right:20px;background:#0ea472;color:#fff;font-size:13px;padding:8px 18px;border-radius:100px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+@media(max-width:600px){.tile.open{grid-column:span 1;}.topbar,.hero,.filters,.gw{padding-left:14px;padding-right:14px;}.hero h2{font-size:20px;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Module Production T1.Standard P</h1>
+  <div class="tbr">
+    <span class="save-ind" id="save-ind">Zapisano ✓</span>
+    <button class="edtbtn" id="edtbtn">Tryb edycji</button>
+  </div>
+</header>
+
+<section class="hero">
+  <h2>Wszystko, czym <em>zajmuje się</em> nasz dział</h2>
+  <p>Kliknij kafelek, aby zobaczyć dokumenty i osoby odpowiedzialne. Kliknij <strong>Tryb edycji</strong>, aby dodać linki bez edytowania HTML.</p>
+  <div class="stats">
+    <div><div class="sv" id="stat-n">18</div><div class="sl">obszarów</div></div>
+    <div><div class="sv">9</div><div class="sl">kategorie</div></div>
+  </div>
+</section>
+
+<div class="edit-notice" id="edit-notice">Tryb edycji aktywny — otwórz kafelek i wklej link. Zmiany zapisują się automatycznie.</div>
+<div class="person-notice" id="person-notice">
+  <span>Tematy osoby: <strong id="pname"></strong></span>
+  <button class="pnclear" id="pnclear">Wyczyść</button>
+</div>
+
+<div class="filters" id="filters"></div>
+
+<div class="gw">
+  <div id="loading" class="loading-msg">Ładowanie danych...</div>
+  <div class="grid" id="grid" style="display:none"></div>
+</div>
+
+<footer class="footer">Module Production T1.Standard P · Ostatnia aktualizacja: 9 marca 2025</footer>
+<div class="toast" id="toast">Zapisano!</div>
+
+<script>
+const TILES=[
+  {id:'sfit',cv:'cs',icon:'🔧',cl:'SFIT / Optimization',title:'SFIT',desc:'Shop Floor Improvement Team — projekty optymalizacyjne na hali produkcyjnej.'},
+  {id:'lob',cv:'cs',icon:'🏭',cl:'SFIT / Optimization',title:'LoB',desc:'Line of Business — zarządzanie liniami produkcyjnymi i procesami operacyjnymi.'},
+  {id:'costsaving',cv:'cc',icon:'💰',cl:'Cost Saving',title:'Cost Saving',desc:'Identyfikacja i wdrażanie inicjatyw oszczędnościowych w obszarze operacyjnym.'},
+  {id:'paperless',cv:'cc',icon:'🌿',cl:'Cost Saving',title:'Paperless',desc:'Digitalizacja dokumentów i procesów — eliminacja obiegu papierowego w dziale.'},
+  {id:'exproom',cv:'ce',icon:'🛡️',cl:'Experience Room',title:'Quality / Safety Experience Room',desc:'Sala doświadczeń jakości i bezpieczeństwa — szkolenia i demonstracje.'},
+  {id:'ideabank',cv:'cz',icon:'💡',cl:'Zgłoszenia pomysłów',title:'Idea Bank',desc:'Bank pomysłów pracowników — zgłaszanie, ocena i wdrażanie usprawnień.'},
+  {id:'ias',cv:'cz',icon:'📐',cl:'Zgłoszenia pomysłów',title:'IAS',desc:'Internal Audit System — zarządzanie audytami wewnętrznymi i dokumentacją.'},
+  {id:'empevent',cv:'cz',icon:'🚀',cl:'Zgłoszenia pomysłów',title:'Empowerment Event',desc:'Eventy angażujące pracowników — organizacja, agenda i materiały.'},
+  {id:'archiwum',cv:'ca',icon:'🗄️',cl:'Archiwum',title:'Archive Room',desc:'Zarządzanie archiwum dokumentów fizycznych i cyfrowych działu.'},
+  {id:'lpa',cv:'cl',icon:'🔍',cl:'LPA',title:'LPA',desc:'Layered Process Audits — warstwowe audyty procesów produkcyjnych.'},
+  {id:'assets',cv:'cx',icon:'🏷️',cl:'Assets',title:'Assets',desc:'Zarządzanie majątkiem trwałym działu — ewidencja, przeglądy i likwidacja.'},
+  {id:'warsztaty',cv:'cw',icon:'🛠️',cl:'Warsztat',title:'Warsztaty',desc:'Organizacja i prowadzenie warsztatów szkoleniowych i doskonalących.'},
+  {id:'daszki',cv:'cw',icon:'🧹',cl:'Warsztat',title:'Czyszczenie daszków',desc:'Harmonogram i dokumentacja czyszczenia daszków i trudnodostępnych obszarów.'},
+  {id:'warsz3r5s',cv:'c3',icon:'♻️',cl:'3R5S',title:'Warsztaty 3R5S',desc:'Warsztaty metodologii 3R5S — organizacja miejsca pracy i eliminacja marnotrawstwa.'},
+  {id:'swat',cv:'c3',icon:'⚡',cl:'3R5S',title:'SWAT',desc:'Szybkie interwencje — zespół reagowania na krytyczne incydenty procesowe.'},
+  {id:'preaudyt',cv:'c3',icon:'🔎',cl:'3R5S',title:'Pre-Audyty',desc:'Przeglądy przygotowawcze przed audytami — identyfikacja obszarów ryzyka.'},
+  {id:'audythq',cv:'c3',icon:'🏢',cl:'3R5S',title:'Audyty HQ',desc:'Audyty przeprowadzane przez centralę — przygotowanie, dokumentacja i follow-up.'},
+  {id:'audytint',cv:'c3',icon:'📝',cl:'3R5S',title:'Audyty Internal',desc:'Wewnętrzne audyty procesów i systemów zarządzania — planowanie i raportowanie.'},
+];
+const CATS=[
+  {f:'cc',label:'Cost Saving'},{f:'cs',label:'SFIT / Optimization'},
+  {f:'c3',label:'3R5S'},{f:'cw',label:'Warsztat'},
+  {f:'cz',label:'Zgłoszenia pomysłów'},{f:'cl',label:'LPA'},
+  {f:'ce',label:'Experience Room'},{f:'ca',label:'Archiwum'},{f:'cx',label:'Assets'}
+];
+
+const DB_KEY = 'mapa_serwisowa_v2';
+let S={links:{},persons:{},dates:{},editMode:false,filter:'all',person:null};
+
+function ini(name){return name.trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+  const si=document.getElementById('save-ind');
+  si.classList.add('show');
+  setTimeout(()=>si.classList.remove('show'),2000);
+}
+
+function saveAll(){
+  const data={};
+  TILES.forEach(t=>{
+    data[t.id]={links:S.links[t.id]||[],persons:S.persons[t.id]||[],date:S.dates[t.id]||'—'};
+  });
+  try{localStorage.setItem(DB_KEY, JSON.stringify(data));}catch(e){}
+  showToast();
+}
+
+function loadAll(){
+  document.getElementById('loading').style.display='block';
+  document.getElementById('grid').style.display='none';
+  try{
+    const raw=localStorage.getItem(DB_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      TILES.forEach(t=>{
+        const d=data[t.id]||{};
+        S.links[t.id]=Array.isArray(d.links)?d.links:[];
+        S.persons[t.id]=Array.isArray(d.persons)?d.persons:[];
+        S.dates[t.id]=d.date||'—';
+      });
+    } else {
+      TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+    }
+  }catch(e){
+    TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+  }
+  document.getElementById('loading').style.display='none';
+  document.getElementById('grid').style.display='grid';
+  renderAll();
+}
+
+function renderAll(){
+  const grid=document.getElementById('grid');
+  const openId=document.querySelector('.tile.open')?.dataset.id||null;
+  grid.innerHTML='';
+  TILES.forEach(t=>{
+    const el=makeTile(t);
+    if(t.id===openId) el.classList.add('open');
+    grid.appendChild(el);
+  });
+  applyVis();
+}
+
+function makeTile(t){
+  const links=S.links[t.id]||[];
+  const persons=S.persons[t.id]||[];
+  const date=S.dates[t.id]||'—';
+  const div=document.createElement('div');
+  div.className='tile'+(S.editMode?' edit-mode':'');
+  div.dataset.id=t.id;div.dataset.cv=t.cv;
+
+  const linksHTML=links.length
+    ?links.map((l,i)=>`<a class="spl" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
+        <div class="sico">📄</div>
+        <div style="flex:1;min-width:0"><div class="snm">${l.name}</div><div class="ssub">SharePoint</div></div>
+        <span class="sarr">→</span>
+        <button class="xbtn" title="Usuń" onclick="event.preventDefault();event.stopPropagation();delLink('${t.id}',${i})">✕</button>
+      </a>`).join('')
+    :`<div class="empty-hint">Brak dokumentów${S.editMode?' — dodaj poniżej':' — dodaj w trybie edycji'}.</div>`;
+
+  const personsHTML=persons.length
+    ?persons.map((p,i)=>`<div class="chip${S.person===p?' pactive':''}" data-name="${p}" onclick="event.stopPropagation();fperson('${p}')">
+        <div class="av">${ini(p)}</div>${p}
+        <button class="xbtn" title="Usuń" onclick="event.preventDefault();event.stopPropagation();delPerson('${t.id}',${i})">✕</button>
+      </div>`).join('')
+    :`<div class="empty-hint">Brak osób${S.editMode?' — dodaj poniżej':' — dodaj w trybie edycji'}.</div>`;
+
+  div.innerHTML=`
+    <div class="stripe" style="background:var(--${t.cv})"></div>
+    <div class="thdr">
+      <div class="tico">${t.icon}</div>
+      <div class="tmeta">
+        <div class="tcat" style="color:var(--${t.cv})">${t.cl}</div>
+        <div class="ttit">${t.title}</div>
+        <div class="tdesc">${t.desc}</div>
+        <div class="tbadges">
+          <span class="bdoc">📄 ${links.length}</span>
+          <span class="bdate">🗓 ${date}</span>
+        </div>
+      </div>
+      <div class="togbtn">+</div>
+    </div>
+    <div class="tbody">
+      <div class="slbl">Dokumenty na SharePoint</div>
+      <div class="llist">${linksHTML}</div>
+      <div class="addform">
+        <input type="text" id="ln-${t.id}" placeholder="Nazwa dokumentu (np. Harmonogram LPA)" />
+        <div class="arow">
+          <input type="url" id="lu-${t.id}" placeholder="https://twoj-link-sharepoint..." />
+          <button class="abtn" onclick="addLink('${t.id}')">+ Dodaj</button>
+        </div>
+      </div>
+      <div class="slbl" style="margin-top:12px">Odpowiedzialni</div>
+      <div class="contacts">${personsHTML}</div>
+      <div class="apform">
+        <input type="text" id="pn-${t.id}" placeholder="Imię i nazwisko" />
+        <button class="abtn" onclick="addPerson('${t.id}')">+ Dodaj</button>
+      </div>
+    </div>`;
+
+  div.addEventListener('click',e=>{
+    if(e.target.closest('a,button,input,.chip'))return;
+    const isOpen=div.classList.contains('open');
+    document.querySelectorAll('.tile.open').forEach(x=>x.classList.remove('open'));
+    if(!isOpen)div.classList.add('open');
+  });
+  return div;
+}
+
+function applyVis(){
+  document.querySelectorAll('.tile').forEach(tile=>{
+    if(S.person){
+      const names=Array.from(tile.querySelectorAll('.chip')).map(c=>c.dataset.name||'');
+      tile.style.display=names.includes(S.person)?'':'none';
+    } else {
+      tile.style.display=(S.filter==='all'||tile.dataset.cv===S.filter)?'':'none';
+    }
+  });
+}
+
+function addLink(id){
+  const nm=document.getElementById('ln-'+id).value.trim();
+  const ur=document.getElementById('lu-'+id).value.trim();
+  if(!nm||!ur){alert('Wpisz nazwę i wklej link.');return;}
+  if(!ur.startsWith('http')){alert('Link powinien zaczynać się od http:// lub https://');return;}
+  S.links[id].push({name:nm,url:ur});
+  S.dates[id]=new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
+  saveAll();
+  renderAll();
+}
+
+function delLink(id,i){S.links[id].splice(i,1);saveAll();renderAll();}
+
+function addPerson(id){
+  const nm=document.getElementById('pn-'+id).value.trim();
+  if(!nm)return;
+  S.persons[id].push(nm);
+  saveAll();renderAll();
+}
+
+function delPerson(id,i){S.persons[id].splice(i,1);saveAll();renderAll();}
+
+function fperson(name){
+  if(S.person===name){
+    S.person=null;
+    document.getElementById('person-notice').classList.remove('show');
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));
+    applyVis();return;
+  }
+  S.person=name;
+  document.getElementById('pname').textContent=name;
+  document.getElementById('person-notice').classList.add('show');
+  document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('act',b.dataset.f==='all'));
+  S.filter='all';applyVis();
+}
+
+document.getElementById('pnclear').onclick=()=>{
+  S.person=null;
+  document.getElementById('person-notice').classList.remove('show');
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));
+  applyVis();
+};
+
+function buildFilters(){
+  const el=document.getElementById('filters');
+  const lbl=document.createElement('span');
+  lbl.className='fl';lbl.textContent='Filtruj:';el.appendChild(lbl);
+  const all=document.createElement('button');
+  all.className='fb act';all.dataset.f='all';all.textContent='Wszystkie';
+  all.onclick=()=>{S.filter='all';S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('act',b.dataset.f==='all'));applyVis();};
+  el.appendChild(all);
+  CATS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='fb';b.dataset.f=c.f;
+    b.innerHTML=`<span class="fd" style="background:var(--${c.f})"></span>${c.label}`;
+    b.onclick=()=>{
+      S.filter=c.f;S.person=null;
+      document.getElementById('person-notice').classList.remove('show');
+      document.querySelectorAll('.fb').forEach(x=>x.classList.toggle('act',x.dataset.f===c.f));
+      applyVis();
+    };
+    el.appendChild(b);
+  });
+}
+
+document.getElementById('edtbtn').onclick=function(){
+  S.editMode=!S.editMode;
+  this.classList.toggle('on',S.editMode);
+  this.textContent=S.editMode?'Zakończ edycję':'Tryb edycji';
+  document.getElementById('edit-notice').classList.toggle('show',S.editMode);
+  renderAll();
+};
+
+buildFilters();
+loadAll();
+</script>
+</body>
+</html>
