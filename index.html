@@ -13,14 +13,31 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(--text);}
+.setup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;}
+.setup-overlay.show{display:flex;}
+.setup-box{background:#fff;border-radius:16px;padding:32px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.setup-box h2{font-size:20px;font-weight:700;color:#0d2d52;margin-bottom:10px;}
+.setup-box p{font-size:13px;color:#4a7ab5;line-height:1.7;margin-bottom:14px;}
+.setup-bin-id{background:#f0f7ff;border:2px solid #1d6fc4;border-radius:8px;padding:12px 16px;font-family:monospace;font-size:14px;font-weight:700;color:#1d6fc4;letter-spacing:1px;text-align:center;margin:14px 0;word-break:break-all;}
+.setup-steps{background:#f8fbff;border-radius:8px;padding:14px;margin-bottom:16px;}
+.setup-steps ol{padding-left:18px;}
+.setup-steps li{font-size:12.5px;color:#4a7ab5;line-height:1.8;}
+.setup-steps code{background:#e8f2fd;padding:1px 6px;border-radius:4px;font-size:12px;color:#1d6fc4;}
+.setup-btn{background:#1d6fc4;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;}
+.setup-btn:hover{background:#1557a8;}
+.setup-btn.sec{background:transparent;color:#4a7ab5;border:1px solid #c5ddf7;margin-top:8px;}
+.setup-btn.sec:hover{background:#f0f7ff;}
 .topbar{background:linear-gradient(135deg,#1d6fc4,#2e8de8);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(29,111,196,.2);}
 .topbar h1{color:#fff;font-size:16px;font-weight:600;}
 .tbr{display:flex;align-items:center;gap:8px;}
+.sdot{width:8px;height:8px;border-radius:50%;background:#a0cfff;flex-shrink:0;transition:background .3s;}
+.sdot.ok{background:#4ade80;}.sdot.err{background:#f87171;}
+.sdot.spin{background:#fbbf24;animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.slbl2{font-size:11px;color:rgba(255,255,255,.8);}
 .edtbtn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:#fff;font-size:12px;padding:5px 14px;border-radius:100px;cursor:pointer;font-family:inherit;transition:all .2s;}
 .edtbtn:hover{background:rgba(255,255,255,0.3);}
 .edtbtn.on{background:#fff;color:#1d6fc4;font-weight:600;}
-.save-ind{font-size:11px;color:rgba(255,255,255,0.85);display:none;}
-.save-ind.show{display:block;}
 .hero{padding:30px 28px 22px;background:linear-gradient(160deg,#deeeff,var(--bg));border-bottom:1px solid var(--border);}
 .hero h2{font-size:26px;font-weight:600;color:var(--text);margin-bottom:6px;}
 .hero h2 em{font-style:normal;color:#1d6fc4;}
@@ -51,6 +68,7 @@ body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(
 .fb[data-f="cx"].act{background:rgba(99,102,241,.1);border-color:var(--cx);color:var(--cx);font-weight:600;}
 .gw{padding:24px 28px;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:11px;}
+.loading-msg{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
 .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,transform .15s,box-shadow .2s;cursor:pointer;}
 .tile:hover{border-color:#7ab8f0;box-shadow:0 4px 18px rgba(29,111,196,.12);transform:translateY(-2px);}
 .tile.open{border-color:#1d6fc4;box-shadow:0 6px 24px rgba(29,111,196,.16);grid-column:span 2;}
@@ -99,49 +117,78 @@ body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(
 .edit-mode .apform{display:flex;}
 .apform input{flex:1;font-family:inherit;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);}
 .apform input:focus{outline:none;border-color:#1d6fc4;}
-.loading-msg{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
 .footer{text-align:center;padding:24px;color:var(--dim);font-size:11px;border-top:1px solid var(--border);background:var(--surface);margin-top:16px;}
-.toast{position:fixed;bottom:20px;right:20px;background:#0ea472;color:#fff;font-size:13px;padding:8px 18px;border-radius:100px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast{position:fixed;bottom:20px;right:20px;background:#0ea472;color:#fff;font-size:13px;padding:8px 18px;border-radius:100px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:998;}
 .toast.show{opacity:1;}
+.toast.err{background:#e11d48;}
 @media(max-width:600px){.tile.open{grid-column:span 1;}.topbar,.hero,.filters,.gw{padding-left:14px;padding-right:14px;}.hero h2{font-size:20px;}}
 </style>
 </head>
 <body>
 
+<div class="setup-overlay" id="setup-overlay">
+  <div class="setup-box">
+    <h2>Pierwsze uruchomienie ✅</h2>
+    <p>Wspólna baza danych została utworzona. Aby wszyscy w zespole widzieli te same dane, wpisz poniższe ID do pliku i wgraj go ponownie na GitHub.</p>
+    <div class="setup-bin-id" id="setup-bin-id">Tworzenie...</div>
+    <div class="setup-steps">
+      <ol>
+        <li>Pobierz plik <code>index.html</code> z GitHub na komputer</li>
+        <li>Otwórz w Notatniku lub edytorze kodu</li>
+        <li>Znajdź linię: <code>const BIN_ID = '';</code></li>
+        <li>Wklej ID: <code>const BIN_ID = 'SKOPIOWANE_ID';</code></li>
+        <li>Zapisz i wgraj z powrotem na GitHub (zastąp stary plik)</li>
+      </ol>
+    </div>
+    <button class="setup-btn" id="setup-copy">Skopiuj ID bazy</button>
+    <button class="setup-btn sec" id="setup-continue">Kontynuuj (dane tylko na tym komputerze)</button>
+  </div>
+</div>
+
 <header class="topbar">
   <h1>Module Production T1.Standard P</h1>
   <div class="tbr">
-    <span class="save-ind" id="save-ind">Zapisano ✓</span>
+    <span class="sdot" id="sdot"></span>
+    <span class="slbl2" id="slbl2"></span>
     <button class="edtbtn" id="edtbtn">Tryb edycji</button>
   </div>
 </header>
 
 <section class="hero">
   <h2>Wszystko, czym <em>zajmuje się</em> nasz dział</h2>
-  <p>Kliknij kafelek, aby zobaczyć dokumenty i osoby odpowiedzialne. Kliknij <strong>Tryb edycji</strong>, aby dodać linki bez edytowania HTML.</p>
+  <p>Kliknij kafelek, aby zobaczyć dokumenty i osoby odpowiedzialne. W trybie edycji możesz dodawać linki — zmiany widoczne dla całego zespołu.</p>
   <div class="stats">
-    <div><div class="sv" id="stat-n">18</div><div class="sl">obszarów</div></div>
+    <div><div class="sv">18</div><div class="sl">obszarów</div></div>
     <div><div class="sv">9</div><div class="sl">kategorie</div></div>
   </div>
 </section>
 
-<div class="edit-notice" id="edit-notice">Tryb edycji aktywny — otwórz kafelek i wklej link. Zmiany zapisują się automatycznie.</div>
+<div class="edit-notice" id="edit-notice">Tryb edycji aktywny — otwórz kafelek i wklej link. Zmiany zapisują się automatycznie i są widoczne dla całego zespołu.</div>
 <div class="person-notice" id="person-notice">
   <span>Tematy osoby: <strong id="pname"></strong></span>
   <button class="pnclear" id="pnclear">Wyczyść</button>
 </div>
-
 <div class="filters" id="filters"></div>
 
 <div class="gw">
-  <div id="loading" class="loading-msg">Ładowanie danych...</div>
+  <div id="loading" class="loading-msg">Łączenie z bazą danych...</div>
   <div class="grid" id="grid" style="display:none"></div>
 </div>
 
-<footer class="footer">Module Production T1.Standard P · Ostatnia aktualizacja: 9 marca 2025</footer>
-<div class="toast" id="toast">Zapisano!</div>
+<footer class="footer">Module Production T1.Standard P · Dane wspólne dla całego zespołu via JSONbin.io</footer>
+<div class="toast" id="toast"></div>
 
 <script>
+/* ══════════════════════════════════════════
+   Po pierwszym uruchomieniu wklej tu swoje
+   ID bazy danych (wyświetli się w oknie):
+   ══════════════════════════════════════════ */
+const BIN_ID = '';
+/* ══════════════════════════════════════════ */
+
+const API_KEY = '$2a$10$ooPrsnz36aoBsNTyEbLoQ.R6eozyLGWnzCiSgAcIFIy3nQ.8vQEny';
+const API = 'https://api.jsonbin.io/v3/b';
+
 const TILES=[
   {id:'sfit',cv:'cs',icon:'🔧',cl:'SFIT / Optimization',title:'SFIT',desc:'Shop Floor Improvement Team — projekty optymalizacyjne na hali produkcyjnej.'},
   {id:'lob',cv:'cs',icon:'🏭',cl:'SFIT / Optimization',title:'LoB',desc:'Line of Business — zarządzanie liniami produkcyjnymi i procesami operacyjnymi.'},
@@ -169,217 +216,171 @@ const CATS=[
   {f:'ce',label:'Experience Room'},{f:'ca',label:'Archiwum'},{f:'cx',label:'Assets'}
 ];
 
-const DB_KEY = 'mapa_serwisowa_v2';
 let S={links:{},persons:{},dates:{},editMode:false,filter:'all',person:null};
+let activeBinId = BIN_ID || localStorage.getItem('mapa_bin_id') || '';
+let saving = false;
 
-function ini(name){return name.trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+function ini(n){return n.trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
+function sync(cls,txt){document.getElementById('sdot').className='sdot '+cls;document.getElementById('slbl2').textContent=txt;}
+function toast(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' show';setTimeout(()=>t.classList.remove('show'),2500);}
 
-function showToast(){
-  const t=document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
-  const si=document.getElementById('save-ind');
-  si.classList.add('show');
-  setTimeout(()=>si.classList.remove('show'),2000);
+function emptyData(){const d={};TILES.forEach(t=>{d[t.id]={links:[],persons:[],date:'—'};});return d;}
+
+async function createBin(){
+  sync('spin','Tworzenie bazy...');
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Name':'mapa-serwisowa','X-Private':'false'},body:JSON.stringify(emptyData())});
+  const d=await r.json();
+  return d.metadata.id;
 }
 
-function saveAll(){
-  const data={};
-  TILES.forEach(t=>{
-    data[t.id]={links:S.links[t.id]||[],persons:S.persons[t.id]||[],date:S.dates[t.id]||'—'};
-  });
-  try{localStorage.setItem(DB_KEY, JSON.stringify(data));}catch(e){}
-  showToast();
-}
-
-function loadAll(){
-  document.getElementById('loading').style.display='block';
-  document.getElementById('grid').style.display='none';
+async function loadBin(id){
+  sync('spin','Ładowanie...');
   try{
-    const raw=localStorage.getItem(DB_KEY);
-    if(raw){
-      const data=JSON.parse(raw);
-      TILES.forEach(t=>{
-        const d=data[t.id]||{};
-        S.links[t.id]=Array.isArray(d.links)?d.links:[];
-        S.persons[t.id]=Array.isArray(d.persons)?d.persons:[];
-        S.dates[t.id]=d.date||'—';
-      });
-    } else {
-      TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
-    }
-  }catch(e){
-    TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+    const r=await fetch(`${API}/${id}/latest`,{headers:{'X-Master-Key':API_KEY,'X-Access-Key':API_KEY}});
+    if(!r.ok)throw new Error();
+    const d=await r.json();
+    const rec=d.record||{};
+    TILES.forEach(t=>{const td=rec[t.id]||{};S.links[t.id]=td.links||[];S.persons[t.id]=td.persons||[];S.dates[t.id]=td.date||'—';});
+    sync('ok','Zsynchronizowano');
+    return true;
+  }catch(e){sync('err','Błąd połączenia');return false;}
+}
+
+async function saveBin(){
+  if(!activeBinId||saving)return;
+  saving=true;sync('spin','Zapisywanie...');
+  const data={};TILES.forEach(t=>{data[t.id]={links:S.links[t.id]||[],persons:S.persons[t.id]||[],date:S.dates[t.id]||'—'};});
+  try{
+    const r=await fetch(`${API}/${activeBinId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(data)});
+    if(!r.ok)throw new Error();
+    sync('ok','Zapisano');toast('Zapisano — widoczne dla całego zespołu');
+  }catch(e){sync('err','Błąd zapisu');toast('Błąd zapisu — sprawdź połączenie',true);}
+  saving=false;
+}
+
+async function init(){
+  TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+  if(!activeBinId){
+    try{
+      const newId=await createBin();
+      activeBinId=newId;
+      localStorage.setItem('mapa_bin_id',newId);
+      document.getElementById('setup-bin-id').textContent=newId;
+      document.getElementById('setup-overlay').classList.add('show');
+    }catch(e){sync('err','Błąd tworzenia bazy');}
+  } else {
+    await loadBin(activeBinId);
   }
   document.getElementById('loading').style.display='none';
   document.getElementById('grid').style.display='grid';
   renderAll();
 }
 
+document.getElementById('setup-copy').onclick=function(){
+  const id=document.getElementById('setup-bin-id').textContent;
+  navigator.clipboard.writeText(id).then(()=>{this.textContent='Skopiowano ✓';setTimeout(()=>{this.textContent='Skopiuj ID bazy';},2000);});
+};
+document.getElementById('setup-continue').onclick=()=>document.getElementById('setup-overlay').classList.remove('show');
+
 function renderAll(){
   const grid=document.getElementById('grid');
   const openId=document.querySelector('.tile.open')?.dataset.id||null;
   grid.innerHTML='';
-  TILES.forEach(t=>{
-    const el=makeTile(t);
-    if(t.id===openId) el.classList.add('open');
-    grid.appendChild(el);
-  });
+  TILES.forEach(t=>{const el=makeTile(t);if(t.id===openId)el.classList.add('open');grid.appendChild(el);});
   applyVis();
 }
 
 function makeTile(t){
-  const links=S.links[t.id]||[];
-  const persons=S.persons[t.id]||[];
-  const date=S.dates[t.id]||'—';
+  const links=S.links[t.id]||[],persons=S.persons[t.id]||[],date=S.dates[t.id]||'—';
   const div=document.createElement('div');
   div.className='tile'+(S.editMode?' edit-mode':'');
   div.dataset.id=t.id;div.dataset.cv=t.cv;
 
-  const linksHTML=links.length
-    ?links.map((l,i)=>`<a class="spl" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
-        <div class="sico">📄</div>
-        <div style="flex:1;min-width:0"><div class="snm">${l.name}</div><div class="ssub">SharePoint</div></div>
-        <span class="sarr">→</span>
-        <button class="xbtn" title="Usuń" onclick="event.preventDefault();event.stopPropagation();delLink('${t.id}',${i})">✕</button>
-      </a>`).join('')
-    :`<div class="empty-hint">Brak dokumentów${S.editMode?' — dodaj poniżej':' — dodaj w trybie edycji'}.</div>`;
+  const lH=links.length?links.map((l,i)=>`<a class="spl" href="${l.url}" target="_blank" onclick="event.stopPropagation()">
+    <div class="sico">📄</div><div style="flex:1;min-width:0"><div class="snm">${l.name}</div><div class="ssub">SharePoint</div></div>
+    <span class="sarr">→</span>
+    <button class="xbtn" onclick="event.preventDefault();event.stopPropagation();delLink('${t.id}',${i})">✕</button></a>`).join('')
+    :`<div class="empty-hint">Brak dokumentów${S.editMode?' — dodaj poniżej':' — włącz tryb edycji'}.</div>`;
 
-  const personsHTML=persons.length
-    ?persons.map((p,i)=>`<div class="chip${S.person===p?' pactive':''}" data-name="${p}" onclick="event.stopPropagation();fperson('${p}')">
-        <div class="av">${ini(p)}</div>${p}
-        <button class="xbtn" title="Usuń" onclick="event.preventDefault();event.stopPropagation();delPerson('${t.id}',${i})">✕</button>
-      </div>`).join('')
-    :`<div class="empty-hint">Brak osób${S.editMode?' — dodaj poniżej':' — dodaj w trybie edycji'}.</div>`;
+  const pH=persons.length?persons.map((p,i)=>`<div class="chip${S.person===p?' pactive':''}" data-name="${p}" onclick="event.stopPropagation();fperson('${p}')">
+    <div class="av">${ini(p)}</div>${p}
+    <button class="xbtn" onclick="event.preventDefault();event.stopPropagation();delPerson('${t.id}',${i})">✕</button></div>`).join('')
+    :`<div class="empty-hint">Brak osób${S.editMode?' — dodaj poniżej':' — włącz tryb edycji'}.</div>`;
 
-  div.innerHTML=`
-    <div class="stripe" style="background:var(--${t.cv})"></div>
-    <div class="thdr">
-      <div class="tico">${t.icon}</div>
-      <div class="tmeta">
-        <div class="tcat" style="color:var(--${t.cv})">${t.cl}</div>
-        <div class="ttit">${t.title}</div>
-        <div class="tdesc">${t.desc}</div>
-        <div class="tbadges">
-          <span class="bdoc">📄 ${links.length}</span>
-          <span class="bdate">🗓 ${date}</span>
-        </div>
-      </div>
-      <div class="togbtn">+</div>
-    </div>
+  div.innerHTML=`<div class="stripe" style="background:var(--${t.cv})"></div>
+    <div class="thdr"><div class="tico">${t.icon}</div><div class="tmeta">
+      <div class="tcat" style="color:var(--${t.cv})">${t.cl}</div>
+      <div class="ttit">${t.title}</div><div class="tdesc">${t.desc}</div>
+      <div class="tbadges"><span class="bdoc">📄 ${links.length}</span><span class="bdate">🗓 ${date}</span></div>
+    </div><div class="togbtn">+</div></div>
     <div class="tbody">
-      <div class="slbl">Dokumenty na SharePoint</div>
-      <div class="llist">${linksHTML}</div>
+      <div class="slbl">Dokumenty na SharePoint</div><div class="llist">${lH}</div>
       <div class="addform">
-        <input type="text" id="ln-${t.id}" placeholder="Nazwa dokumentu (np. Harmonogram LPA)" />
-        <div class="arow">
-          <input type="url" id="lu-${t.id}" placeholder="https://twoj-link-sharepoint..." />
-          <button class="abtn" onclick="addLink('${t.id}')">+ Dodaj</button>
-        </div>
+        <input type="text" id="ln-${t.id}" placeholder="Nazwa dokumentu" />
+        <div class="arow"><input type="url" id="lu-${t.id}" placeholder="https://link-sharepoint..." /><button class="abtn" onclick="addLink('${t.id}')">+ Dodaj</button></div>
       </div>
       <div class="slbl" style="margin-top:12px">Odpowiedzialni</div>
-      <div class="contacts">${personsHTML}</div>
-      <div class="apform">
-        <input type="text" id="pn-${t.id}" placeholder="Imię i nazwisko" />
-        <button class="abtn" onclick="addPerson('${t.id}')">+ Dodaj</button>
-      </div>
+      <div class="contacts">${pH}</div>
+      <div class="apform"><input type="text" id="pn-${t.id}" placeholder="Imię i nazwisko" /><button class="abtn" onclick="addPerson('${t.id}')">+ Dodaj</button></div>
     </div>`;
 
   div.addEventListener('click',e=>{
     if(e.target.closest('a,button,input,.chip'))return;
-    const isOpen=div.classList.contains('open');
+    const o=div.classList.contains('open');
     document.querySelectorAll('.tile.open').forEach(x=>x.classList.remove('open'));
-    if(!isOpen)div.classList.add('open');
+    if(!o)div.classList.add('open');
   });
   return div;
 }
 
 function applyVis(){
   document.querySelectorAll('.tile').forEach(tile=>{
-    if(S.person){
-      const names=Array.from(tile.querySelectorAll('.chip')).map(c=>c.dataset.name||'');
-      tile.style.display=names.includes(S.person)?'':'none';
-    } else {
-      tile.style.display=(S.filter==='all'||tile.dataset.cv===S.filter)?'':'none';
-    }
+    if(S.person){const n=Array.from(tile.querySelectorAll('.chip')).map(c=>c.dataset.name||'');tile.style.display=n.includes(S.person)?'':'none';}
+    else{tile.style.display=(S.filter==='all'||tile.dataset.cv===S.filter)?'':'none';}
   });
 }
 
 function addLink(id){
-  const nm=document.getElementById('ln-'+id).value.trim();
-  const ur=document.getElementById('lu-'+id).value.trim();
-  if(!nm||!ur){alert('Wpisz nazwę i wklej link.');return;}
-  if(!ur.startsWith('http')){alert('Link powinien zaczynać się od http:// lub https://');return;}
+  const nm=document.getElementById('ln-'+id).value.trim(),ur=document.getElementById('lu-'+id).value.trim();
+  if(!nm||!ur){toast('Wpisz nazwę i wklej link.',true);return;}
+  if(!ur.startsWith('http')){toast('Link musi zaczynać się od http://',true);return;}
   S.links[id].push({name:nm,url:ur});
   S.dates[id]=new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
-  saveAll();
-  renderAll();
+  document.getElementById('ln-'+id).value='';document.getElementById('lu-'+id).value='';
+  saveBin();renderAll();
 }
-
-function delLink(id,i){S.links[id].splice(i,1);saveAll();renderAll();}
-
-function addPerson(id){
-  const nm=document.getElementById('pn-'+id).value.trim();
-  if(!nm)return;
-  S.persons[id].push(nm);
-  saveAll();renderAll();
-}
-
-function delPerson(id,i){S.persons[id].splice(i,1);saveAll();renderAll();}
+function delLink(id,i){S.links[id].splice(i,1);saveBin();renderAll();}
+function addPerson(id){const nm=document.getElementById('pn-'+id).value.trim();if(!nm)return;S.persons[id].push(nm);document.getElementById('pn-'+id).value='';saveBin();renderAll();}
+function delPerson(id,i){S.persons[id].splice(i,1);saveBin();renderAll();}
 
 function fperson(name){
-  if(S.person===name){
-    S.person=null;
-    document.getElementById('person-notice').classList.remove('show');
-    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));
-    applyVis();return;
-  }
-  S.person=name;
-  document.getElementById('pname').textContent=name;
-  document.getElementById('person-notice').classList.add('show');
-  document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('act',b.dataset.f==='all'));
-  S.filter='all';applyVis();
+  if(S.person===name){S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));applyVis();return;}
+  S.person=name;document.getElementById('pname').textContent=name;document.getElementById('person-notice').classList.add('show');
+  document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('act',b.dataset.f==='all'));S.filter='all';applyVis();
 }
-
-document.getElementById('pnclear').onclick=()=>{
-  S.person=null;
-  document.getElementById('person-notice').classList.remove('show');
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));
-  applyVis();
-};
+document.getElementById('pnclear').onclick=()=>{S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));applyVis();};
 
 function buildFilters(){
   const el=document.getElementById('filters');
-  const lbl=document.createElement('span');
-  lbl.className='fl';lbl.textContent='Filtruj:';el.appendChild(lbl);
-  const all=document.createElement('button');
-  all.className='fb act';all.dataset.f='all';all.textContent='Wszystkie';
+  const lbl=document.createElement('span');lbl.className='fl';lbl.textContent='Filtruj:';el.appendChild(lbl);
+  const all=document.createElement('button');all.className='fb act';all.dataset.f='all';all.textContent='Wszystkie';
   all.onclick=()=>{S.filter='all';S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('act',b.dataset.f==='all'));applyVis();};
   el.appendChild(all);
   CATS.forEach(c=>{
-    const b=document.createElement('button');
-    b.className='fb';b.dataset.f=c.f;
+    const b=document.createElement('button');b.className='fb';b.dataset.f=c.f;
     b.innerHTML=`<span class="fd" style="background:var(--${c.f})"></span>${c.label}`;
-    b.onclick=()=>{
-      S.filter=c.f;S.person=null;
-      document.getElementById('person-notice').classList.remove('show');
-      document.querySelectorAll('.fb').forEach(x=>x.classList.toggle('act',x.dataset.f===c.f));
-      applyVis();
-    };
+    b.onclick=()=>{S.filter=c.f;S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.fb').forEach(x=>x.classList.toggle('act',x.dataset.f===c.f));applyVis();};
     el.appendChild(b);
   });
 }
-
 document.getElementById('edtbtn').onclick=function(){
-  S.editMode=!S.editMode;
-  this.classList.toggle('on',S.editMode);
+  S.editMode=!S.editMode;this.classList.toggle('on',S.editMode);
   this.textContent=S.editMode?'Zakończ edycję':'Tryb edycji';
-  document.getElementById('edit-notice').classList.toggle('show',S.editMode);
-  renderAll();
+  document.getElementById('edit-notice').classList.toggle('show',S.editMode);renderAll();
 };
 
 buildFilters();
-loadAll();
+init();
 </script>
 </body>
 </html>
