@@ -13,28 +13,13 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(--text);}
-.setup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;}
-.setup-overlay.show{display:flex;}
-.setup-box{background:#fff;border-radius:16px;padding:32px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
-.setup-box h2{font-size:20px;font-weight:700;color:#0d2d52;margin-bottom:10px;}
-.setup-box p{font-size:13px;color:#4a7ab5;line-height:1.7;margin-bottom:14px;}
-.setup-bin-id{background:#f0f7ff;border:2px solid #1d6fc4;border-radius:8px;padding:12px 16px;font-family:monospace;font-size:14px;font-weight:700;color:#1d6fc4;letter-spacing:1px;text-align:center;margin:14px 0;word-break:break-all;}
-.setup-steps{background:#f8fbff;border-radius:8px;padding:14px;margin-bottom:16px;}
-.setup-steps ol{padding-left:18px;}
-.setup-steps li{font-size:12.5px;color:#4a7ab5;line-height:1.8;}
-.setup-steps code{background:#e8f2fd;padding:1px 6px;border-radius:4px;font-size:12px;color:#1d6fc4;}
-.setup-btn{background:#1d6fc4;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;}
-.setup-btn:hover{background:#1557a8;}
-.setup-btn.sec{background:transparent;color:#4a7ab5;border:1px solid #c5ddf7;margin-top:8px;}
-.setup-btn.sec:hover{background:#f0f7ff;}
 .topbar{background:linear-gradient(135deg,#1d6fc4,#2e8de8);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(29,111,196,.2);}
 .topbar h1{color:#fff;font-size:16px;font-weight:600;}
 .tbr{display:flex;align-items:center;gap:8px;}
 .sdot{width:8px;height:8px;border-radius:50%;background:#a0cfff;flex-shrink:0;transition:background .3s;}
-.sdot.ok{background:#4ade80;}.sdot.err{background:#f87171;}
-.sdot.spin{background:#fbbf24;animation:blink 1s infinite;}
+.sdot.ok{background:#4ade80;}.sdot.err{background:#f87171;}.sdot.spin{background:#fbbf24;animation:blink 1s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.slbl2{font-size:11px;color:rgba(255,255,255,.8);}
+.slbl{font-size:11px;color:rgba(255,255,255,.8);}
 .edtbtn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.35);color:#fff;font-size:12px;padding:5px 14px;border-radius:100px;cursor:pointer;font-family:inherit;transition:all .2s;}
 .edtbtn:hover{background:rgba(255,255,255,0.3);}
 .edtbtn.on{background:#fff;color:#1d6fc4;font-weight:600;}
@@ -86,7 +71,7 @@ body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(
 .tile.open .togbtn{background:#1d6fc4;border-color:#1d6fc4;color:#fff;transform:rotate(45deg);}
 .tbody{display:none;padding:0 17px 15px;border-top:1px solid var(--border);}
 .tile.open .tbody{display:block;}
-.slbl{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin:12px 0 6px;}
+.slbl2{font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin:12px 0 6px;}
 .llist{display:flex;flex-direction:column;gap:4px;}
 .spl{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-decoration:none;color:var(--text);font-size:12px;transition:all .2s;}
 .spl:hover{border-color:#7ab8f0;background:#deeeff;}
@@ -126,30 +111,11 @@ body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(
 </head>
 <body>
 
-<div class="setup-overlay" id="setup-overlay">
-  <div class="setup-box">
-    <h2>Pierwsze uruchomienie ✅</h2>
-    <p>Wspólna baza danych została utworzona. Aby wszyscy w zespole widzieli te same dane, wpisz poniższe ID do pliku i wgraj go ponownie na GitHub.</p>
-    <div class="setup-bin-id" id="setup-bin-id">Tworzenie...</div>
-    <div class="setup-steps">
-      <ol>
-        <li>Pobierz plik <code>index.html</code> z GitHub na komputer</li>
-        <li>Otwórz w Notatniku lub edytorze kodu</li>
-        <li>Znajdź linię: <code>const BIN_ID = '';</code></li>
-        <li>Wklej ID: <code>const BIN_ID = 'SKOPIOWANE_ID';</code></li>
-        <li>Zapisz i wgraj z powrotem na GitHub (zastąp stary plik)</li>
-      </ol>
-    </div>
-    <button class="setup-btn" id="setup-copy">Skopiuj ID bazy</button>
-    <button class="setup-btn sec" id="setup-continue">Kontynuuj (dane tylko na tym komputerze)</button>
-  </div>
-</div>
-
 <header class="topbar">
   <h1>Module Production T1.Standard P</h1>
   <div class="tbr">
     <span class="sdot" id="sdot"></span>
-    <span class="slbl2" id="slbl2"></span>
+    <span class="slbl" id="slbl"></span>
     <button class="edtbtn" id="edtbtn">Tryb edycji</button>
   </div>
 </header>
@@ -175,19 +141,14 @@ body{font-family:'Arial Narrow',Arial,sans-serif;background:var(--bg);color:var(
   <div class="grid" id="grid" style="display:none"></div>
 </div>
 
-<footer class="footer">Module Production T1.Standard P · Dane wspólne dla całego zespołu via JSONbin.io</footer>
+<footer class="footer">Module Production T1.Standard P · Dane wspólne dla całego zespołu</footer>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════════
-   Po pierwszym uruchomieniu wklej tu swoje
-   ID bazy danych (wyświetli się w oknie):
-   ══════════════════════════════════════════ */
-const BIN_ID = '';
-/* ══════════════════════════════════════════ */
-
-const API_KEY = '$2a$10$ooPrsnz36aoBsNTyEbLoQ.R6eozyLGWnzCiSgAcIFIy3nQ.8vQEny';
-const API = 'https://api.jsonbin.io/v3/b';
+const GITHUB_TOKEN = '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';
+const GITHUB_REPO  = 'ipopiolek/mapa-serwisowa';
+const DATA_FILE    = 'data.json';
+const API_BASE     = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + DATA_FILE;
 
 const TILES=[
   {id:'sfit',cv:'cs',icon:'🔧',cl:'SFIT / Optimization',title:'SFIT',desc:'Shop Floor Improvement Team — projekty optymalizacyjne na hali produkcyjnej.'},
@@ -217,70 +178,113 @@ const CATS=[
 ];
 
 let S={links:{},persons:{},dates:{},editMode:false,filter:'all',person:null};
-let activeBinId = BIN_ID || localStorage.getItem('mapa_bin_id') || '';
+let fileSHA = null;
 let saving = false;
 
 function ini(n){return n.trim().split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
-function sync(cls,txt){document.getElementById('sdot').className='sdot '+cls;document.getElementById('slbl2').textContent=txt;}
+function sync(cls,txt){document.getElementById('sdot').className='sdot '+cls;document.getElementById('slbl').textContent=txt;}
 function toast(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'')+' show';setTimeout(()=>t.classList.remove('show'),2500);}
 
-function emptyData(){const d={};TILES.forEach(t=>{d[t.id]={links:[],persons:[],date:'—'};});return d;}
-
-async function createBin(){
-  sync('spin','Tworzenie bazy...');
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Name':'mapa-serwisowa','X-Private':'false'},body:JSON.stringify(emptyData())});
-  const d=await r.json();
-  return d.metadata.id;
+function emptyData(){
+  const d={};
+  TILES.forEach(t=>{d[t.id]={links:[],persons:[],date:'—'};});
+  return d;
 }
 
-async function loadBin(id){
+async function loadData(){
   sync('spin','Ładowanie...');
   try{
-    const r=await fetch(`${API}/${id}/latest`,{headers:{'X-Master-Key':API_KEY,'X-Access-Key':API_KEY}});
-    if(!r.ok)throw new Error();
-    const d=await r.json();
-    const rec=d.record||{};
-    TILES.forEach(t=>{const td=rec[t.id]||{};S.links[t.id]=td.links||[];S.persons[t.id]=td.persons||[];S.dates[t.id]=td.date||'—';});
+    const r = await fetch(API_BASE, {
+      headers:{
+        'Authorization':'token '+GITHUB_TOKEN,
+        'Accept':'application/vnd.github.v3+json'
+      }
+    });
+    if(r.status === 404){
+      // File doesn't exist yet — create it
+      await createDataFile();
+      return;
+    }
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const meta = await r.json();
+    fileSHA = meta.sha;
+    const content = JSON.parse(atob(meta.content.replace(/\n/g,'')));
+    TILES.forEach(t=>{
+      const td = content[t.id]||{};
+      S.links[t.id]   = Array.isArray(td.links)   ? td.links   : [];
+      S.persons[t.id] = Array.isArray(td.persons) ? td.persons : [];
+      S.dates[t.id]   = td.date || '—';
+    });
     sync('ok','Zsynchronizowano');
-    return true;
-  }catch(e){sync('err','Błąd połączenia');return false;}
+  }catch(e){
+    sync('err','Błąd połączenia');
+    // Fall back to empty data so UI still works
+    TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+  }
 }
 
-async function saveBin(){
-  if(!activeBinId||saving)return;
-  saving=true;sync('spin','Zapisywanie...');
-  const data={};TILES.forEach(t=>{data[t.id]={links:S.links[t.id]||[],persons:S.persons[t.id]||[],date:S.dates[t.id]||'—'};});
+async function createDataFile(){
+  sync('spin','Tworzenie bazy...');
+  const data = emptyData();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
   try{
-    const r=await fetch(`${API}/${activeBinId}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(data)});
-    if(!r.ok)throw new Error();
-    sync('ok','Zapisano');toast('Zapisano — widoczne dla całego zespołu');
-  }catch(e){sync('err','Błąd zapisu');toast('Błąd zapisu — sprawdź połączenie',true);}
-  saving=false;
+    const r = await fetch(API_BASE,{
+      method:'PUT',
+      headers:{
+        'Authorization':'token '+GITHUB_TOKEN,
+        'Accept':'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify({message:'Inicjalizacja bazy mapy serwisowej', content})
+    });
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    fileSHA = d.content.sha;
+    TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
+    sync('ok','Baza utworzona');
+  }catch(e){
+    sync('err','Błąd tworzenia bazy');
+  }
+}
+
+async function saveData(){
+  if(saving) return;
+  saving = true;
+  sync('spin','Zapisywanie...');
+  const data={};
+  TILES.forEach(t=>{data[t.id]={links:S.links[t.id]||[],persons:S.persons[t.id]||[],date:S.dates[t.id]||'—'};});
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  try{
+    const body = {message:'Aktualizacja mapy serwisowej', content};
+    if(fileSHA) body.sha = fileSHA;
+    const r = await fetch(API_BASE,{
+      method:'PUT',
+      headers:{
+        'Authorization':'token '+GITHUB_TOKEN,
+        'Accept':'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    fileSHA = d.content.sha;
+    sync('ok','Zapisano');
+    toast('Zapisano — widoczne dla całego zespołu');
+  }catch(e){
+    sync('err','Błąd zapisu');
+    toast('Błąd zapisu',true);
+  }
+  saving = false;
 }
 
 async function init(){
   TILES.forEach(t=>{S.links[t.id]=[];S.persons[t.id]=[];S.dates[t.id]='—';});
-  if(!activeBinId){
-    try{
-      const newId=await createBin();
-      activeBinId=newId;
-      localStorage.setItem('mapa_bin_id',newId);
-      document.getElementById('setup-bin-id').textContent=newId;
-      document.getElementById('setup-overlay').classList.add('show');
-    }catch(e){sync('err','Błąd tworzenia bazy');}
-  } else {
-    await loadBin(activeBinId);
-  }
+  await loadData();
   document.getElementById('loading').style.display='none';
   document.getElementById('grid').style.display='grid';
   renderAll();
 }
-
-document.getElementById('setup-copy').onclick=function(){
-  const id=document.getElementById('setup-bin-id').textContent;
-  navigator.clipboard.writeText(id).then(()=>{this.textContent='Skopiowano ✓';setTimeout(()=>{this.textContent='Skopiuj ID bazy';},2000);});
-};
-document.getElementById('setup-continue').onclick=()=>document.getElementById('setup-overlay').classList.remove('show');
 
 function renderAll(){
   const grid=document.getElementById('grid');
@@ -314,12 +318,12 @@ function makeTile(t){
       <div class="tbadges"><span class="bdoc">📄 ${links.length}</span><span class="bdate">🗓 ${date}</span></div>
     </div><div class="togbtn">+</div></div>
     <div class="tbody">
-      <div class="slbl">Dokumenty na SharePoint</div><div class="llist">${lH}</div>
+      <div class="slbl2">Dokumenty na SharePoint</div><div class="llist">${lH}</div>
       <div class="addform">
         <input type="text" id="ln-${t.id}" placeholder="Nazwa dokumentu" />
         <div class="arow"><input type="url" id="lu-${t.id}" placeholder="https://link-sharepoint..." /><button class="abtn" onclick="addLink('${t.id}')">+ Dodaj</button></div>
       </div>
-      <div class="slbl" style="margin-top:12px">Odpowiedzialni</div>
+      <div class="slbl2" style="margin-top:12px">Odpowiedzialni</div>
       <div class="contacts">${pH}</div>
       <div class="apform"><input type="text" id="pn-${t.id}" placeholder="Imię i nazwisko" /><button class="abtn" onclick="addPerson('${t.id}')">+ Dodaj</button></div>
     </div>`;
@@ -347,11 +351,15 @@ function addLink(id){
   S.links[id].push({name:nm,url:ur});
   S.dates[id]=new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
   document.getElementById('ln-'+id).value='';document.getElementById('lu-'+id).value='';
-  saveBin();renderAll();
+  saveData();renderAll();
 }
-function delLink(id,i){S.links[id].splice(i,1);saveBin();renderAll();}
-function addPerson(id){const nm=document.getElementById('pn-'+id).value.trim();if(!nm)return;S.persons[id].push(nm);document.getElementById('pn-'+id).value='';saveBin();renderAll();}
-function delPerson(id,i){S.persons[id].splice(i,1);saveBin();renderAll();}
+function delLink(id,i){S.links[id].splice(i,1);saveData();renderAll();}
+function addPerson(id){
+  const nm=document.getElementById('pn-'+id).value.trim();if(!nm)return;
+  S.persons[id].push(nm);document.getElementById('pn-'+id).value='';
+  saveData();renderAll();
+}
+function delPerson(id,i){S.persons[id].splice(i,1);saveData();renderAll();}
 
 function fperson(name){
   if(S.person===name){S.person=null;document.getElementById('person-notice').classList.remove('show');document.querySelectorAll('.chip').forEach(c=>c.classList.remove('pactive'));applyVis();return;}
